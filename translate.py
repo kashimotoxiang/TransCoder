@@ -79,7 +79,8 @@ class Translator:
         assert self.reloaded_params.mask_index == self.dico.index(MASK_WORD)
 
         # build model / reload weights
-        self.reloaded_params['reload_model'] = ','.join([params.model_path] * 2)
+        self.reloaded_params['reload_model'] = ','.join(
+            [params.model_path] * 2)
         encoder, decoder = build_model(self.reloaded_params, self.dico)
 
         self.encoder = encoder[0]
@@ -92,14 +93,11 @@ class Translator:
         assert len(reloaded['decoder'].keys()) == len(
             list(p for p, _ in self.decoder.state_dict().items()))
 
-        self.encoder.cuda()
-        self.decoder.cuda()
-
         self.encoder.eval()
         self.decoder.eval()
         self.bpe_model = fastBPE.fastBPE(os.path.abspath(params.BPE_path))
 
-    def translate(self, input, lang1, lang2, n=1, beam_size=1, sample_temperature=None, device='cuda:0'):
+    def translate(self, input, lang1, lang2, n=1, beam_size=1, sample_temperature=None, device='cpu'):
         with torch.no_grad():
             assert lang1 in {'python', 'java', 'cpp'}, lang1
             assert lang2 in {'python', 'java', 'cpp'}, lang2
